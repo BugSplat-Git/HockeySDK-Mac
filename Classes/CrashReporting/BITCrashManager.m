@@ -728,6 +728,10 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
           
           [self.crashReportUI setUserName:[self userNameForCrashReport]];
           [self.crashReportUI setUserEmail:[self userEmailForCrashReport]];
+            
+            if (self.bannerImage) {
+                self.crashReportUI.imageView.image = self.bannerImage;
+            }
           
           if (self.crashReportUI.nibDidLoadSuccessfully) {
             [self.crashReportUI askCrashReportDetails];
