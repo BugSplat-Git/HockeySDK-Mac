@@ -216,7 +216,7 @@
 		80EF93A41CD9334B006722E1 /* BITHockeyLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 80EF93A11CD9334B006722E1 /* BITHockeyLogger.m */; };
 		80EF93A51CD9334B006722E1 /* BITHockeyLoggerPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 80EF93A21CD9334B006722E1 /* BITHockeyLoggerPrivate.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		80EF93A71CD94773006722E1 /* HockeySDKEnums.h in Headers */ = {isa = PBXBuildFile; fileRef = 80EF93A61CD94773006722E1 /* HockeySDKEnums.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		A9B572A42017F75C002F9448 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A9B572A32017F75C002F9448 /* Images.xcassets */; };
+		A992C236201CAF8B001623B6 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A992C235201CAF8B001623B6 /* Images.xcassets */; };
 		B270E4D81F3A51BC001C1C85 /* HockeySDKPrivate.m in Sources */ = {isa = PBXBuildFile; fileRef = B270E4D61F3A51BC001C1C85 /* HockeySDKPrivate.m */; };
 		B270E4D91F3A51CF001C1C85 /* HockeySDKPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = B270E4D51F3A51BC001C1C85 /* HockeySDKPrivate.h */; };
 		B270E4DA1F3A51D8001C1C85 /* HockeySDKPrivate.m in Sources */ = {isa = PBXBuildFile; fileRef = B270E4D61F3A51BC001C1C85 /* HockeySDKPrivate.m */; };
@@ -423,7 +423,7 @@
 		80EF93A11CD9334B006722E1 /* BITHockeyLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BITHockeyLogger.m; sourceTree = "<group>"; };
 		80EF93A21CD9334B006722E1 /* BITHockeyLoggerPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BITHockeyLoggerPrivate.h; sourceTree = "<group>"; };
 		80EF93A61CD94773006722E1 /* HockeySDKEnums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HockeySDKEnums.h; path = ../Classes/Helper/HockeySDKEnums.h; sourceTree = "<group>"; };
-		A9B572A32017F75C002F9448 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		A992C235201CAF8B001623B6 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		B270E4D51F3A51BC001C1C85 /* HockeySDKPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HockeySDKPrivate.h; sourceTree = "<group>"; };
 		B270E4D61F3A51BC001C1C85 /* HockeySDKPrivate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HockeySDKPrivate.m; sourceTree = "<group>"; };
 		B270E4DB1F3A52A2001C1C85 /* HockeySDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HockeySDK.h; sourceTree = "<group>"; };
@@ -697,7 +697,7 @@
 				1EF09DBA1523579A00067A5C /* HockeySDK-Info.plist */,
 				1EF09DBB1523579A00067A5C /* HockeySDK-Prefix.pch */,
 				1E413D9315A0BB8800620BFE /* HockeySDK.strings */,
-				A9B572A32017F75C002F9448 /* Images.xcassets */,
+				A992C235201CAF8B001623B6 /* Images.xcassets */,
 			);
 			name = Resources;
 			path = ../Resources;
@@ -967,7 +967,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1E7E5510187F3ED800F0858E /* BITFeedbackWindowController.xib in Resources */,
-				A9B572A42017F75C002F9448 /* Images.xcassets in Resources */,
+				A992C236201CAF8B001623B6 /* Images.xcassets in Resources */,
 				1E413D9615A0FA0100620BFE /* HockeySDK.strings in Resources */,
 				1EBDC04A195710CA00B5C8A3 /* BITCrashReportUI.xib in Resources */,
 			);
