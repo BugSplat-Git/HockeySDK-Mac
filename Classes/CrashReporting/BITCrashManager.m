@@ -917,6 +917,13 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
     if ([report.applicationInfo.applicationVersion compare:(id)[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]] == NSOrderedSame) {
       self.crashIdenticalCurrentVersion = YES;
     }
+      
+    NSString *applicationKey = @"";
+      
+    if ([self.delegate respondsToSelector:@selector(applicationKeyForCrashManager:exceptionReason:)])
+    {
+        applicationKey = [self.delegate applicationKeyForCrashManager:self exceptionReason:report.exceptionInfo.exceptionReason];
+    }
     
     NSString *username = @"";
     NSString *useremail = @"";
@@ -956,8 +963,9 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
     }
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wcstring-format-directive"
-    crashXML = [NSString stringWithFormat:@"<crashes><crash><applicationname>%s</applicationname><uuids>%@</uuids><bundleidentifier>%@</bundleidentifier><systemversion>%@</systemversion><platform>%@</platform><senderversion>%@</senderversion><versionstring>%@</versionstring><version>%@</version><uuid>%@</uuid><log><![CDATA[%@]]></log><userid>%@</userid><username>%@</username><contact>%@</contact><installstring>%@</installstring><description><![CDATA[%@]]></description></crash></crashes>",
+    crashXML = [NSString stringWithFormat:@"<crashes><crash><applicationname>%s</applicationname><applicationkey>%@</applicationkey><uuids>%@</uuids><bundleidentifier>%@</bundleidentifier><systemversion>%@</systemversion><platform>%@</platform><senderversion>%@</senderversion><versionstring>%@</versionstring><version>%@</version><uuid>%@</uuid><log><![CDATA[%@]]></log><userid>%@</userid><username>%@</username><contact>%@</contact><installstring>%@</installstring><description><![CDATA[%@]]></description></crash></crashes>",
                 [[self applicationName] UTF8String],
+                applicationKey,
                 appBinaryUUIDs,
                 appBundleIdentifier,
                 osVersion,
