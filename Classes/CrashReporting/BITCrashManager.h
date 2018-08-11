@@ -120,6 +120,11 @@ typedef NS_ENUM(NSUInteger, BITCrashManagerUserInput) {
  */
 @property (nonatomic, assign) BOOL askUserDetails;
 
+/**
+ *  Custom banner image (440x110) to be presented in crash reporter window.  Scales down propertionately.
+ */
+@property (nonatomic, strong) NSImage *bannerImage;
+
 
 /**
  *  Trap fatal signals via a Mach exception server. This is now used by default!
