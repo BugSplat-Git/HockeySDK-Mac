@@ -2,12 +2,11 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "bugsplat-logo.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "bugsplat-logo@2x.png",
+      "filename" : "logo2x.png",
       "scale" : "2x"
     },
     {
