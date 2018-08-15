@@ -920,9 +920,9 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
       
     NSString *applicationKey = @"";
       
-    if ([self.delegate respondsToSelector:@selector(applicationKeyForCrashManager:exceptionReason:)])
+      if ([self.delegate respondsToSelector:@selector(applicationKeyForCrashManager:signal:exceptionName:exceptionReason:)])
     {
-        applicationKey = [self.delegate applicationKeyForCrashManager:self exceptionReason:report.exceptionInfo.exceptionReason];
+        applicationKey = [self.delegate applicationKeyForCrashManager:self signal:report.signalInfo.name exceptionName:report.exceptionInfo.exceptionName exceptionReason:report.exceptionInfo.exceptionReason];
     }
     
     NSString *username = @"";
