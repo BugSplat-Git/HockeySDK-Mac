@@ -61,6 +61,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly)BITInternal *internal;
 
 /**
+ *  Flag to enable/disable storing user settings in keychain
+ */
+@property (nonatomic, assign) BOOL persistUserInfo;
+
+/**
  *  Initializes a telemetry context.
  *
  *  @param appIdentifier the appIdentifier of the app

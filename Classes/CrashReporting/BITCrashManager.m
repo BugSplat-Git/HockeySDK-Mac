@@ -128,7 +128,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
     self.crashReportUI = nil;
     self.fileManager = [[NSFileManager alloc] init];
     _askUserDetails = YES;
-    
+          
     _plcrExceptionHandler = nil;
     _crashCallBacks = nil;
     _crashIdenticalCurrentVersion = YES;
@@ -216,9 +216,11 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
 - (void)loadSettings {
   NSString *errorString = nil;
   NSPropertyListFormat format;
-  
-  self.userName = bit_stringValueFromKeychainForKey([NSString stringWithFormat:@"default.%@", kBITCrashMetaUserName]);
-  self.userEmail = bit_stringValueFromKeychainForKey([NSString stringWithFormat:@"default.%@", kBITCrashMetaUserEmail]);
+    
+  if (self.persistUserInfo) {
+    self.userName = bit_stringValueFromKeychainForKey([NSString stringWithFormat:@"default.%@", kBITCrashMetaUserName]);
+    self.userEmail = bit_stringValueFromKeychainForKey([NSString stringWithFormat:@"default.%@", kBITCrashMetaUserEmail]);
+  }
   
   if (![self.fileManager fileExistsAtPath:self.settingsFile])
     return;
@@ -252,10 +254,12 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
   [self.fileManager removeItemAtPath:[filename stringByAppendingString:@".meta"] error:&error];
   [self.fileManager removeItemAtPath:[filename stringByAppendingString:@".desc"] error:&error];
   
-  NSString *cacheFilename = [filename lastPathComponent];
-  bit_removeKeyFromKeychain([NSString stringWithFormat:@"%@.%@", cacheFilename, kBITCrashMetaUserName]);
-  bit_removeKeyFromKeychain([NSString stringWithFormat:@"%@.%@", cacheFilename, kBITCrashMetaUserEmail]);
-  bit_removeKeyFromKeychain([NSString stringWithFormat:@"%@.%@", cacheFilename, kBITCrashMetaUserID]);
+  if (self.persistUserInfo) {
+    NSString *cacheFilename = [filename lastPathComponent];
+    bit_removeKeyFromKeychain([NSString stringWithFormat:@"%@.%@", cacheFilename, kBITCrashMetaUserName]);
+    bit_removeKeyFromKeychain([NSString stringWithFormat:@"%@.%@", cacheFilename, kBITCrashMetaUserEmail]);
+    bit_removeKeyFromKeychain([NSString stringWithFormat:@"%@.%@", cacheFilename, kBITCrashMetaUserID]);
+  }  
   
   [self.crashFiles removeObject:filename];
   [self.approvedCrashReports removeObjectForKey:filename];
@@ -294,17 +298,17 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
     [userProvidedMetaData.userDescription writeToFile:[NSString stringWithFormat:@"%@.desc", [self.crashesDir stringByAppendingPathComponent: self.lastCrashFilename]] atomically:YES encoding:NSUTF8StringEncoding error:&error];
   }
   
-  if (userProvidedMetaData.userName && [userProvidedMetaData.userName length] > 0) {
+  if (userProvidedMetaData.userName && [userProvidedMetaData.userName length] > 0 && self.persistUserInfo) {
     bit_addStringValueToKeychain(userProvidedMetaData.userName, [NSString stringWithFormat:@"default.%@", kBITCrashMetaUserName]);
     bit_addStringValueToKeychain(userProvidedMetaData.userName, [NSString stringWithFormat:@"%@.%@", self.lastCrashFilename, kBITCrashMetaUserName]);
   }
   
-  if (userProvidedMetaData.userEmail && [userProvidedMetaData.userEmail length] > 0) {
+  if (userProvidedMetaData.userEmail && [userProvidedMetaData.userEmail length] > 0 && self.persistUserInfo) {
     bit_addStringValueToKeychain(userProvidedMetaData.userEmail, [NSString stringWithFormat:@"default.%@", kBITCrashMetaUserEmail]);
     bit_addStringValueToKeychain(userProvidedMetaData.userEmail, [NSString stringWithFormat:@"%@.%@", self.lastCrashFilename, kBITCrashMetaUserEmail]);
   }
   
-  if (userProvidedMetaData.userID && [userProvidedMetaData.userID length] > 0) {
+  if (userProvidedMetaData.userID && [userProvidedMetaData.userID length] > 0 && self.persistUserInfo) {
     bit_addStringValueToKeychain(userProvidedMetaData.userID, [NSString stringWithFormat:@"%@.%@", self.lastCrashFilename, kBITCrashMetaUserID]);
   }
 }
@@ -369,7 +373,9 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
   if (self.userID)
     return self.userID;
   
-  userID = bit_stringValueFromKeychainForKey(kBITDefaultUserID);
+  if (self.persistUserInfo) {
+    userID = bit_stringValueFromKeychainForKey(kBITDefaultUserID);
+  }
   
   id<BITHockeyManagerDelegate> delegate = [BITHockeyManager sharedHockeyManager].delegate;
   if (delegate && [delegate respondsToSelector:@selector(userIDForHockeyManager:componentManager:)]) {
@@ -386,7 +392,9 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
   if (self.userName)
     return self.userName;
   
-  userName = bit_stringValueFromKeychainForKey(kBITDefaultUserName);
+  if (self.persistUserInfo) {
+    userName = bit_stringValueFromKeychainForKey(kBITDefaultUserName);
+  }
   
   id<BITHockeyManagerDelegate> delegate = [BITHockeyManager sharedHockeyManager].delegate;
   if (delegate && [delegate respondsToSelector:@selector(userNameForHockeyManager:componentManager:)]) {
@@ -403,7 +411,10 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
   if (self.userEmail)
     return self.userEmail;
   
-  userEmail = bit_stringValueFromKeychainForKey(kBITDefaultUserEmail);
+  if (self.persistUserInfo) {
+    userEmail = bit_stringValueFromKeychainForKey(kBITDefaultUserEmail);
+  }
+  
   
   id<BITHockeyManagerDelegate> delegate = [BITHockeyManager sharedHockeyManager].delegate;
   if (delegate && [delegate respondsToSelector:@selector(userEmailForHockeyManager:componentManager:)]) {
@@ -461,9 +472,12 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
   NSString *applicationLog = @"";
   NSString *errorString = nil;
   
-  bit_addStringValueToKeychain([self userNameForCrashReport], [NSString stringWithFormat:@"%@.%@", filename, kBITCrashMetaUserName]);
-  bit_addStringValueToKeychain([self userEmailForCrashReport], [NSString stringWithFormat:@"%@.%@", filename, kBITCrashMetaUserEmail]);
-  bit_addStringValueToKeychain([self userIDForCrashReport], [NSString stringWithFormat:@"%@.%@", filename, kBITCrashMetaUserID]);
+  if (self.persistUserInfo)
+  {
+    bit_addStringValueToKeychain([self userNameForCrashReport], [NSString stringWithFormat:@"%@.%@", filename, kBITCrashMetaUserName]);
+    bit_addStringValueToKeychain([self userEmailForCrashReport], [NSString stringWithFormat:@"%@.%@", filename, kBITCrashMetaUserEmail]);
+    bit_addStringValueToKeychain([self userIDForCrashReport], [NSString stringWithFormat:@"%@.%@", filename, kBITCrashMetaUserID]);
+  }
   
   if (self.delegate != nil && [self.delegate respondsToSelector:@selector(applicationLogForCrashManager:)]) {
     applicationLog = [self.delegate applicationLogForCrashManager:self] ?: @"";
@@ -939,9 +953,12 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
                                                 format:&format
                                                 errorDescription:&errorString];
       
-      username = bit_stringValueFromKeychainForKey([NSString stringWithFormat:@"%@.%@", [filename lastPathComponent], kBITCrashMetaUserName]) ?: @"";
-      useremail = bit_stringValueFromKeychainForKey([NSString stringWithFormat:@"%@.%@", [filename lastPathComponent], kBITCrashMetaUserEmail]) ?: @"";
-      userid = bit_stringValueFromKeychainForKey([NSString stringWithFormat:@"%@.%@", [filename lastPathComponent], kBITCrashMetaUserID]) ?: @"";
+      if (self.persistUserInfo) {
+        username = bit_stringValueFromKeychainForKey([NSString stringWithFormat:@"%@.%@", [filename lastPathComponent], kBITCrashMetaUserName]) ?: @"";
+        useremail = bit_stringValueFromKeychainForKey([NSString stringWithFormat:@"%@.%@", [filename lastPathComponent], kBITCrashMetaUserEmail]) ?: @"";
+        userid = bit_stringValueFromKeychainForKey([NSString stringWithFormat:@"%@.%@", [filename lastPathComponent], kBITCrashMetaUserID]) ?: @"";
+      }
+      
       applicationLog = [metaDict objectForKey:kBITCrashMetaApplicationLog] ?: @"";
       description = [metaDict objectForKey:kBITCrashMetaDescription] ?: @"";
       attachment = [self attachmentForCrashReport:filename];

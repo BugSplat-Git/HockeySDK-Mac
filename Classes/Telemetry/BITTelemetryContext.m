@@ -29,12 +29,15 @@ static char *const BITContextOperationsQueue = "net.hockeyapp.telemetryContextQu
   if ((self = [self init])) {
     _persistence = persistence;
     _appIdentifier = appIdentifier;
+    
+    _persistUserInfo = NO;
+      
     BITDevice *deviceContext = [BITDevice new];
     deviceContext.model = bit_devicePlatform();
     deviceContext.type = bit_deviceType();
     deviceContext.osVersion = bit_osVersionBuild();
     deviceContext.os = bit_osName();
-    deviceContext.deviceId = bit_appAnonID(NO);
+    deviceContext.deviceId = self.persistUserInfo ? bit_appAnonID(NO) : bit_UUID();
     deviceContext.locale = bit_deviceLocale();
     deviceContext.language = bit_deviceLanguage();
     deviceContext.screenResolution = bit_screenSize();
