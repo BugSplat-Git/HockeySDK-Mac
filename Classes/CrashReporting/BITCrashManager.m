@@ -939,8 +939,8 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
         applicationKey = [self.delegate applicationKeyForCrashManager:self signal:report.signalInfo.name exceptionName:report.exceptionInfo.exceptionName exceptionReason:report.exceptionInfo.exceptionReason];
     }
     
-    NSString *username = @"";
-    NSString *useremail = @"";
+    NSString *username = self.userName;
+    NSString *useremail = self.userEmail;
     NSString *userid = @"";
     NSString *applicationLog = @"";
     NSString *description = @"";
