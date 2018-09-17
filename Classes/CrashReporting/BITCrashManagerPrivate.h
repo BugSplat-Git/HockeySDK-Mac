@@ -56,7 +56,7 @@
 
 - (BOOL)persistAttachment:(BITHockeyAttachment *)attachment withFilename:(NSString *)filename;
 
-- (BITHockeyAttachment *)attachmentForCrashReport:(NSString *)filename;
+- (NSArray <BITHockeyAttachment *> *)attachmentsForCrashReport:(NSString *)filename;
 
 - (void)setLastCrashFilename:(NSString *)lastCrashFilename;
 
