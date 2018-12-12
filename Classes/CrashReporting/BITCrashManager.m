@@ -549,8 +549,12 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
       return YES;
       
     case BITCrashManagerUserInputSend:
-      if (userProvidedMetaData)
+      if (userProvidedMetaData && self.persistUserInfo)
         [self persistUserProvidedMetaData:userProvidedMetaData];
+      else if (userProvidedMetaData) {
+          self.userName = userProvidedMetaData.userName ?: self.userName;
+          self.userEmail = userProvidedMetaData.userEmail ?: self.userEmail;
+      }
       
       [self approveLatestCrashReport];
       [self sendNextCrashReport];
