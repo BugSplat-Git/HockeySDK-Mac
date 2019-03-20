@@ -39,7 +39,7 @@
 - (id)init {
   if ((self = [super init])) {
     _didAskUserData = NO;
-    
+          
     _requireUserName = BITFeedbackUserDataElementOptional;
     _requireUserEmail = BITFeedbackUserDataElementOptional;
     _showAlertOnIncomingMessages = YES;
@@ -164,7 +164,7 @@
 - (BOOL)updateUserIDUsingDelegate {
   BOOL availableViaDelegate = NO;
   
-  NSString *userID = bit_stringValueFromKeychainForKey(kBITDefaultUserID);
+  NSString *userID = self.persistUserInfo ? bit_stringValueFromKeychainForKey(kBITDefaultUserID) : @"";
   
   id<BITHockeyManagerDelegate> delegate = [BITHockeyManager sharedHockeyManager].delegate;
   if (delegate && [delegate respondsToSelector:@selector(userIDForHockeyManager:componentManager:)]) {
@@ -183,7 +183,7 @@
 - (BOOL)updateUserNameUsingDelegate {
   BOOL availableViaDelegate = NO;
   
-  NSString *userName = bit_stringValueFromKeychainForKey(kBITDefaultUserName);
+  NSString *userName = self.persistUserInfo ? bit_stringValueFromKeychainForKey(kBITDefaultUserName) : @"";
   
   id<BITHockeyManagerDelegate> delegate = [BITHockeyManager sharedHockeyManager].delegate;
   if (delegate && [delegate respondsToSelector:@selector(userNameForHockeyManager:componentManager:)]) {
@@ -203,7 +203,7 @@
 - (BOOL)updateUserEmailUsingDelegate {
   BOOL availableViaDelegate = NO;
   
-  NSString *userEmail = bit_stringValueFromKeychainForKey(kBITDefaultUserEmail);
+  NSString *userEmail = self.persistUserInfo ? bit_stringValueFromKeychainForKey(kBITDefaultUserEmail) : @"";
   
   id<BITHockeyManagerDelegate> delegate = [BITHockeyManager sharedHockeyManager].delegate;
   if (delegate && [delegate respondsToSelector:@selector(userEmailForHockeyManager:componentManager:)]) {

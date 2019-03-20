@@ -24,6 +24,8 @@
     _userID = nil;
     _userName = nil;
     _userEmail = nil;
+      
+    _persistUserInfo = NO;
     
     NSLocale *enUSPOSIXLocale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
     _rfc3339Formatter = [[NSDateFormatter alloc] init];
