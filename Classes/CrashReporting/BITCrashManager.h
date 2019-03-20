@@ -126,6 +126,14 @@ typedef NS_ENUM(NSUInteger, BITCrashManagerUserInput) {
 @property (nonatomic, strong) NSImage *bannerImage;
 
 /**
+ *  Defines if crash reports should be considered "expired" after a certain amount of time (in seconds).
+ *  If expired crash dialogue is not displayed but reports are still uploaded.
+ *
+ *  Default: -1 // No expiration
+ */
+@property (nonatomic, assign) NSTimeInterval expirationTimeInterval;
+
+/**
  *  Trap fatal signals via a Mach exception server. This is now used by default!
  *
  *  Default: _YES_

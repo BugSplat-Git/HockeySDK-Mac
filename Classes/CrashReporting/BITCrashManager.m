@@ -134,6 +134,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
     _crashIdenticalCurrentVersion = YES;
     
     _timeintervalCrashInLastSessionOccured = -1;
+    _expirationTimeInterval = -1;
     
     _approvedCrashReports = [[NSMutableDictionary alloc] init];
     _dictOfLastSessionCrash = [[NSMutableDictionary alloc] init];
@@ -557,7 +558,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
       }
       
       [self approveLatestCrashReport];
-      [self sendNextCrashReport];
+      [self sendNextCrashReportAndShowSupportPage:YES];
       return YES;
       
     case BITCrashManagerUserInputAlwaysSend:
@@ -567,7 +568,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
         [self persistUserProvidedMetaData:userProvidedMetaData];
       
       [self approveLatestCrashReport];
-      [self sendNextCrashReport];
+      [self sendNextCrashReportAndShowSupportPage:NO];
       return YES;
   }
   return NO;
@@ -746,48 +747,57 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
       
       NSData *crashData = [NSData dataWithContentsOfFile: [self.crashesDir stringByAppendingPathComponent:self.lastCrashFilename]];
       BITPLCrashReport *report = [[BITPLCrashReport alloc] initWithData:crashData error:&error];
-      NSString *installString = [BITSystemProfile deviceIdentifier] ?: @"";
-      crashReport = [BITCrashReportTextFormatter stringValueForCrashReport:report crashReporterKey:installString];
+    
+      NSTimeInterval crashTimeInterval = [[NSDate date] timeIntervalSinceDate:report.systemInfo.timestamp];
+        
+      if (self.expirationTimeInterval != -1 && crashTimeInterval > self.expirationTimeInterval) {
+        [self approveLatestCrashReport];
+        [self sendNextCrashReportAndShowSupportPage:NO];
+      }
+      else {
+        NSString *installString = [BITSystemProfile deviceIdentifier] ?: @"";
+        crashReport = [BITCrashReportTextFormatter stringValueForCrashReport:report crashReporterKey:installString];
       
-      if (crashReport && !error) {
-        NSString *log = [self.dictOfLastSessionCrash valueForKey:kBITCrashMetaApplicationLog] ?: @"";
-        
-        if (self.delegate != nil && [self.delegate respondsToSelector:@selector(crashManagerWillShowSubmitCrashReportAlert:)]) {
-          [self.delegate crashManagerWillShowSubmitCrashReportAlert:self];
-        }
-        
-        if (self.crashReportUIHandler) {
-          self.crashReportUIHandler(crashReport, log);
-        } else {
-          self.crashReportUI = [[BITCrashReportUI alloc] initWithManager:self
-                                                             crashReport:crashReport
-                                                              logContent:log
-                                                         applicationName:[self applicationName]
-                                                          askUserDetails:self.askUserDetails];
+        if (crashReport && !error) {
+          NSString *log = [self.dictOfLastSessionCrash valueForKey:kBITCrashMetaApplicationLog] ?: @"";
           
-          [self.crashReportUI setUserName:[self userNameForCrashReport]];
-          [self.crashReportUI setUserEmail:[self userEmailForCrashReport]];
-            
-            if (self.bannerImage) {
-                self.crashReportUI.imageView.image = self.bannerImage;
-            }
-          
-          if (self.crashReportUI.nibDidLoadSuccessfully) {
-            [self.crashReportUI askCrashReportDetails];
-            [self.crashReportUI showWindow:self];
-            [self.crashReportUI.window setLevel:NSNormalWindowLevel+1];
-            [self.crashReportUI.window makeKeyAndOrderFront:self];
-          } else {
-            [self approveLatestCrashReport];
-            [self sendNextCrashReport];
+          if (self.delegate != nil && [self.delegate respondsToSelector:@selector(crashManagerWillShowSubmitCrashReportAlert:)]) {
+              [self.delegate crashManagerWillShowSubmitCrashReportAlert:self];
           }
+          
+          if (self.crashReportUIHandler) {
+              self.crashReportUIHandler(crashReport, log);
+          } else {
+              self.crashReportUI = [[BITCrashReportUI alloc] initWithManager:self
+                                                                 crashReport:crashReport
+                                                                  logContent:log
+                                                             applicationName:[self applicationName]
+                                                              askUserDetails:self.askUserDetails];
+              
+              [self.crashReportUI setUserName:[self userNameForCrashReport]];
+              [self.crashReportUI setUserEmail:[self userEmailForCrashReport]];
+              
+              if (self.bannerImage) {
+                  self.crashReportUI.imageView.image = self.bannerImage;
+              }
+              
+              if (self.crashReportUI.nibDidLoadSuccessfully) {
+                  [self.crashReportUI askCrashReportDetails];
+                  [self.crashReportUI showWindow:self];
+                  [self.crashReportUI.window setLevel:NSNormalWindowLevel+1];
+                  [self.crashReportUI.window makeKeyAndOrderFront:self];
+              } else {
+                  [self approveLatestCrashReport];
+                  [self sendNextCrashReportAndShowSupportPage:NO];
+              }
+          }
+        } else {
+          [self cleanCrashReportWithFilename:self.lastCrashFilename];
         }
-      } else {
-        [self cleanCrashReportWithFilename:self.lastCrashFilename];
       }
     } else {
       [self approveLatestCrashReport];
-      [self sendNextCrashReport];
+      [self sendNextCrashReportAndShowSupportPage:NO];
     }
   }
   
@@ -900,7 +910,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
  *
  * Gathers all collected data and constructs the XML structure and starts the sending process
  */
-- (void)sendNextCrashReport {
+- (void)sendNextCrashReportAndShowSupportPage:(BOOL)showSupportPage {
   NSError *error = NULL;
   
   self.crashIdenticalCurrentVersion = NO;
@@ -1024,7 +1034,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
                 [description stringByReplacingOccurrencesOfString:@"]]>" withString:@"]]" @"]]><![CDATA[" @">" options:NSLiteralSearch range:NSMakeRange(0,description.length)]];
 #pragma clang diagnostic pop
     BITHockeyLogDebug(@"INFO: Sending crash reports:\n%@", crashXML);
-    [self sendCrashReportWithFilename:filename xml:crashXML attachments:attachments];
+      [self sendCrashReportWithFilename:filename xml:crashXML attachments:attachments showSupportPage:showSupportPage];
   } else {
     // we cannot do anything with this report, so delete it
     [self cleanCrashReportWithFilename:filename];
@@ -1078,7 +1088,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
 }
 
 - (NSMutableURLRequest *)requestWithBoundary:(NSString *)boundary {
-  NSString *postCrashPath = [NSString stringWithFormat:@"api/2/apps/%@/crashes", self.encodedAppIdentifier];
+  NSString *postCrashPath = [NSString stringWithFormat:@"api/3/apps/%@/crashes", self.encodedAppIdentifier];
   
   NSMutableURLRequest *request = [self.hockeyAppClient requestWithMethod:@"POST"
                                                                     path:postCrashPath
@@ -1095,7 +1105,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
 }
 
 // process upload response
-- (void)processUploadResultWithFilename:(NSString *)filename responseData:(NSData *)responseData statusCode:(NSInteger)statusCode error:(NSError *)error {
+- (void)processUploadResultWithFilename:(NSString *)filename responseData:(NSData *)responseData statusCode:(NSInteger)statusCode showSupportPage:(BOOL)showSupportPage error:(NSError *)error {
   __block NSError *theError = error;
   
   dispatch_async(dispatch_get_main_queue(), ^{
@@ -1112,11 +1122,24 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
       } else if (statusCode >= 200 && statusCode < 400) {
         [self cleanCrashReportWithFilename:filename];
         
-        // HockeyApp uses PList XML format
-        NSMutableDictionary *response = [NSPropertyListSerialization propertyListWithData:responseData
-                                                                                  options:NSPropertyListMutableContainersAndLeaves
-                                                                                   format:nil
-                                                                                    error:&theError];
+        NSDictionary *response = [NSJSONSerialization JSONObjectWithData:responseData options:0 error:&theError];
+
+        if (response) {
+          NSString *infoUrl = [response objectForKey:@"infoUrl"];
+
+          if (infoUrl && showSupportPage)
+          {
+            NSString *encodedInfoUrl = [infoUrl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            NSURL *supportPageURL = [NSURL URLWithString:encodedInfoUrl];
+                  
+            if (supportPageURL)
+            {
+              // Open Bugsplat support page in default browser
+              [[NSWorkspace sharedWorkspace] openURL:supportPageURL];
+            }
+          }
+        }
+
         BITHockeyLogDebug(@"INFO: Received API response: %@", response);
         
         if ([self.delegate respondsToSelector:@selector(crashManagerDidFinishSendingCrashReport:)]) {
@@ -1124,7 +1147,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
         }
         
         // only if sending the crash report went successfully, continue with the next one (if there are more)
-        [self sendNextCrashReport];
+        [self sendNextCrashReportAndShowSupportPage:NO];
       } else if (statusCode == 400) {
         [self cleanCrashReportWithFilename:filename];
         
@@ -1161,7 +1184,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
  *
  *	@param	xml	The XML data that needs to be send to the server
  */
-- (void)sendCrashReportWithFilename:(NSString *)filename xml:(NSString*)xml attachments:(NSArray<BITHockeyAttachment *> *)attachments {
+- (void)sendCrashReportWithFilename:(NSString *)filename xml:(NSString*)xml attachments:(NSArray<BITHockeyAttachment *> *)attachments showSupportPage:(BOOL)showSupportPage {
   NSURLSessionConfiguration *sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
   __block NSURLSession *session = [NSURLSession sessionWithConfiguration:sessionConfiguration];
   
@@ -1179,7 +1202,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
                                                         
                                                         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*) response;
                                                         NSInteger statusCode = [httpResponse statusCode];
-                                                        [strongSelf processUploadResultWithFilename:filename responseData:responseData statusCode:statusCode error:error];
+                                                        [strongSelf processUploadResultWithFilename:filename responseData:responseData statusCode:statusCode showSupportPage:showSupportPage error:error];
                                                       }];
     
     [uploadTask resume];
