@@ -1024,7 +1024,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
 }
 
 - (NSMutableURLRequest *)requestWithBoundary:(NSString *)boundary {
-  NSString *postCrashPath = [NSString stringWithFormat:@"api/2/apps/%@/crashes", self.encodedAppIdentifier];
+  NSString *postCrashPath = [NSString stringWithFormat:@"api/3/apps/%@/crashes", self.encodedAppIdentifier];
   
   NSMutableURLRequest *request = [self.hockeyAppClient requestWithMethod:@"POST"
                                                                     path:postCrashPath
@@ -1058,11 +1058,18 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
       } else if (statusCode >= 200 && statusCode < 400) {
         [self cleanCrashReportWithFilename:filename];
         
-        // HockeyApp uses PList XML format
-        NSMutableDictionary *response = [NSPropertyListSerialization propertyListWithData:responseData
-                                                                                  options:NSPropertyListMutableContainersAndLeaves
-                                                                                   format:nil
-                                                                                    error:&theError];
+        NSDictionary *response = [NSJSONSerialization JSONObjectWithData:responseData options:NSJSONReadingAllowFragments error:&theError];
+
+          if (response) {
+              NSString *infoUrl = [response objectForKey:@"infoUrl"];
+
+              if (infoUrl && infoUrl.length)
+              {
+                  NSURL *supportURL = [NSURL URLWithString:infoUrl];
+                  [[NSWorkspace sharedWorkspace] openURL:supportURL];
+              }
+          }
+
         BITHockeyLogDebug(@"INFO: Received API response: %@", response);
         
         if ([self.delegate respondsToSelector:@selector(crashManagerDidFinishSendingCrashReport:)]) {
