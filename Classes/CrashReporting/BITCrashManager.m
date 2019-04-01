@@ -1125,6 +1125,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
         NSDictionary *response = [NSJSONSerialization JSONObjectWithData:responseData options:0 error:&theError];
 
         if (response) {
+            
           NSString *infoUrl = [response objectForKey:@"infoUrl"];
 
           if (infoUrl.length && showSupportPage)
