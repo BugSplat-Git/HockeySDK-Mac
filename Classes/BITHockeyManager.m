@@ -297,27 +297,33 @@ NSString *const kBITHockeySDKURL = @"https://sdk.hockeyapp.net/";
 }
 
 - (void)setUserID:(NSString *)userID {
-  if (!userID) {
-    bit_removeKeyFromKeychain(kBITDefaultUserID);
-  } else {
-    bit_addStringValueToKeychain(userID, kBITDefaultUserID);
+  if (self.crashManager.persistUserInfo) {
+    if (!userID) {
+      bit_removeKeyFromKeychain(kBITDefaultUserID);
+    } else {
+      bit_addStringValueToKeychain(userID, kBITDefaultUserID);
+    }
   }
 }
 
 - (void)setUserName:(NSString *)userName {
-  if (!userName) {
-    bit_removeKeyFromKeychain(kBITDefaultUserName);
-  } else {
-    bit_addStringValueToKeychain(userName, kBITDefaultUserName);
+  if (self.crashManager.persistUserInfo) {
+    if (!userName) {
+      bit_removeKeyFromKeychain(kBITDefaultUserName);
+    } else {
+      bit_addStringValueToKeychain(userName, kBITDefaultUserName);
+    }
   }
 }
 
 - (void)setUserEmail:(NSString *)userEmail {
-  if (!userEmail) {
-    bit_removeKeyFromKeychain(kBITDefaultUserEmail);
-  } else {
-    bit_addStringValueToKeychain(userEmail, kBITDefaultUserEmail);
-  }
+  if (self.crashManager.persistUserInfo) {
+    if (!userEmail) {
+      bit_removeKeyFromKeychain(kBITDefaultUserEmail);
+    } else {
+      bit_addStringValueToKeychain(userEmail, kBITDefaultUserEmail);
+    }
+  }  
 }
 
 - (void)testIdentifier {
@@ -361,6 +367,7 @@ NSString *const kBITHockeySDKURL = @"https://sdk.hockeyapp.net/";
   } else {
     BITHockeyLogDebug(@"INFO: Setup FeedbackManager");
     self.feedbackManager = [[BITFeedbackManager alloc] initWithAppIdentifier:self.appIdentifier];
+    self.feedbackManager.persistUserInfo = self.crashManager.persistUserInfo;
     
     BITHockeyLogDebug(@"INFO: Setup MetricsManager");
     NSString *iKey = bit_appIdentifierToGuid(self.appIdentifier);

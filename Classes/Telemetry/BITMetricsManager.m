@@ -245,6 +245,7 @@ static NSString *const BITMetricsURLPathString = @"v2/track";
   @synchronized(self) {
     if (!_telemetryContext) {
       _telemetryContext = [[BITTelemetryContext alloc] initWithAppIdentifier:self.appIdentifier persistence:self.persistence];
+      _telemetryContext.persistUserInfo = self.persistUserInfo;
     }
     return _telemetryContext;
   }
