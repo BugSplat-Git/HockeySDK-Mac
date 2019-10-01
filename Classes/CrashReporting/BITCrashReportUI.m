@@ -107,6 +107,11 @@ static const CGFloat kDetailsHeight = 285;
 
 
 - (void)endCrashReporter {
+  NSApplication *application = [NSApplication sharedApplication];
+  if ([application modalWindow]) {
+    [application stopModal];
+  }
+
   [self close];
 }
 

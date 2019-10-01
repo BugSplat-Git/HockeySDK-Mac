@@ -783,9 +783,15 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
               
               if (self.crashReportUI.nibDidLoadSuccessfully) {
                   [self.crashReportUI askCrashReportDetails];
-                  [self.crashReportUI showWindow:self];
-                  [self.crashReportUI.window setLevel:NSNormalWindowLevel+1];
-                  [self.crashReportUI.window makeKeyAndOrderFront:self];
+
+                  if (self.presentModally) {
+                      [[NSApplication sharedApplication] runModalForWindow:self.crashReportUI.window];
+                  }
+                  else {
+                      [self.crashReportUI showWindow:self];
+                      [self.crashReportUI.window setLevel:NSNormalWindowLevel+1];
+                      [self.crashReportUI.window makeKeyAndOrderFront:self];
+                  }
               } else {
                   [self approveLatestCrashReport];
                   [self sendNextCrashReportAndShowSupportPage:NO];
