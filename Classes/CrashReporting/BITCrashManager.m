@@ -110,8 +110,6 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
 @property (nonatomic, strong) BITPLCrashReporter *plCrashReporter;
 @property (nonatomic, strong) BITCrashReportUI *crashReportUI;
 
-@property (nonatomic, strong) id appLaunchObserver;
-
 @property (nonatomic, strong) NSMutableDictionary *approvedCrashReports;
 @property (nonatomic, strong) NSMutableDictionary *dictOfLastSessionCrash;
 
@@ -168,8 +166,8 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
     self.crashesDir = bit_settingsDir();
     _settingsFile = [self.crashesDir stringByAppendingPathComponent:BITHOCKEY_CRASH_SETTINGS];
     _analyzerInProgressFile = [self.crashesDir stringByAppendingPathComponent:BITHOCKEY_CRASH_ANALYZER];
+    
   }
-
   return self;
 }
 
@@ -186,10 +184,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
   
   _approvedCrashReports = nil;
   _dictOfLastSessionCrash = nil;
-
-  if (_appLaunchObserver) {
-    [[NSNotificationCenter defaultCenter] removeObserver:_appLaunchObserver];
-  }
+  
 }
 
 - (void)setServerURL:(NSString *)serverURL {
@@ -734,11 +729,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
 }
 
 - (void)invokeProcessing {
-  NSLog(@"INFO: Start CrashManager processing");
-
-  if (self.appLaunchObserver) {
-    [[NSNotificationCenter defaultCenter] removeObserver:self.appLaunchObserver];
-  }
+  BITHockeyLogDebug(@"INFO: Start CrashManager processing");
   
   if (!self.sendingInProgress && [self hasPendingCrashReport]) {
     self.sendingInProgress = YES;
@@ -898,23 +889,8 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
     [self.delegate showMainApplicationWindowForCrashManager:self];
   }
 #pragma clang diagnostic pop
-
-    BOOL didLaunch = [[NSRunningApplication currentApplication] isFinishedLaunching];
-
-  if (didLaunch) {
-    [self invokeProcessing];
-  } else {
-      __weak typeof(self)weakSelf;
-
-      id notificationBlock = ^{
-          [weakSelf invokeProcessing];
-      };
-
-      self.appLaunchObserver = [[NSNotificationCenter defaultCenter] addObserverForName:NSApplicationDidFinishLaunchingNotification
-                                                                                 object:nil
-                                                                                  queue:[NSOperationQueue mainQueue]
-                                                                             usingBlock:notificationBlock];
-  }
+  
+  [self invokeProcessing];
 }
 
 // slightly delayed startup processing, so we don't keep the first runloop on startup busy for too long
