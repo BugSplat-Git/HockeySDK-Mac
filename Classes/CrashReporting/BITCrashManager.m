@@ -302,27 +302,60 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
     return [data writeToFile:attachmentFilename atomically:YES];
 }
 
+- (void)persistDescription:(NSString *)description {
+    NSString *descriptionPath = [NSString stringWithFormat:@"%@.desc", [self.crashesDir stringByAppendingPathComponent: self.lastCrashFilename]];
+
+    if (description && [description length] > 0) {
+        NSError *error;
+        [description writeToFile:descriptionPath atomically:YES encoding:NSUTF8StringEncoding error:&error];
+    }
+}
+
+- (void)persistUsername:(NSString *)username {
+    NSString *usernameKey = [NSString stringWithFormat:@"default.%@", kBITCrashMetaUserName];
+    NSString *crashFileUsernameKey = [NSString stringWithFormat:@"%@.%@", self.lastCrashFilename, kBITCrashMetaUserName];
+
+    if (username && [username length] > 0 && self.persistUserInfo) {
+        bit_addStringValueToKeychain(username, usernameKey);
+        bit_addStringValueToKeychain(username, crashFileUsernameKey);
+    } else {
+        bit_removeKeyFromKeychain(usernameKey);
+        bit_removeKeyFromKeychain(crashFileUsernameKey);
+    }
+}
+
+- (void)persistUserEmail:(NSString *)userEmail {
+    NSString *userEmailKey = [NSString stringWithFormat:@"default.%@", kBITCrashMetaUserEmail];
+    NSString *crashFileUserEmailKey = [NSString stringWithFormat:@"%@.%@", self.lastCrashFilename, kBITCrashMetaUserEmail];
+
+    if (userEmail && [userEmail length] > 0 && self.persistUserInfo) {
+        bit_addStringValueToKeychain(userEmail, userEmailKey);
+        bit_addStringValueToKeychain(userEmail, crashFileUserEmailKey);
+    }
+    else {
+        bit_removeKeyFromKeychain(userEmailKey);
+        bit_removeKeyFromKeychain(crashFileUserEmailKey);
+    }
+}
+
+- (void)persistUserID:(NSString *)userID {
+    NSString *userIDKey = [NSString stringWithFormat:@"%@.%@", self.lastCrashFilename, kBITCrashMetaUserID];
+
+    if (userID && [userID length] > 0 && self.persistUserInfo) {
+        bit_addStringValueToKeychain(userID, userIDKey);
+    }
+    else {
+        bit_removeKeyFromKeychain(userIDKey);
+    }
+}
+
 - (void)persistUserProvidedMetaData:(BITCrashMetaData *)userProvidedMetaData {
     if (!userProvidedMetaData) return;
 
-    if (userProvidedMetaData.userDescription && [userProvidedMetaData.userDescription length] > 0) {
-        NSError *error;
-        [userProvidedMetaData.userDescription writeToFile:[NSString stringWithFormat:@"%@.desc", [self.crashesDir stringByAppendingPathComponent: self.lastCrashFilename]] atomically:YES encoding:NSUTF8StringEncoding error:&error];
-    }
-
-    if (userProvidedMetaData.userName && [userProvidedMetaData.userName length] > 0 && self.persistUserInfo) {
-        bit_addStringValueToKeychain(userProvidedMetaData.userName, [NSString stringWithFormat:@"default.%@", kBITCrashMetaUserName]);
-        bit_addStringValueToKeychain(userProvidedMetaData.userName, [NSString stringWithFormat:@"%@.%@", self.lastCrashFilename, kBITCrashMetaUserName]);
-    }
-
-    if (userProvidedMetaData.userEmail && [userProvidedMetaData.userEmail length] > 0 && self.persistUserInfo) {
-        bit_addStringValueToKeychain(userProvidedMetaData.userEmail, [NSString stringWithFormat:@"default.%@", kBITCrashMetaUserEmail]);
-        bit_addStringValueToKeychain(userProvidedMetaData.userEmail, [NSString stringWithFormat:@"%@.%@", self.lastCrashFilename, kBITCrashMetaUserEmail]);
-    }
-
-    if (userProvidedMetaData.userID && [userProvidedMetaData.userID length] > 0 && self.persistUserInfo) {
-        bit_addStringValueToKeychain(userProvidedMetaData.userID, [NSString stringWithFormat:@"%@.%@", self.lastCrashFilename, kBITCrashMetaUserID]);
-    }
+    [self persistDescription:userProvidedMetaData.userDescription];
+    [self persistUsername:userProvidedMetaData.userName];
+    [self persistUserEmail:userProvidedMetaData.userEmail];
+    [self persistUserID:userProvidedMetaData.userID];
 }
 
 - (NSArray *)attachmentFilesForCrashReport:(NSString *)filename {
@@ -902,11 +935,13 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
     BOOL didLaunch = [[NSRunningApplication currentApplication] isFinishedLaunching];
 
     if (didLaunch) {
+        BITHockeyLogDebug(@"INFO: App has launched - invokeProcessing");
         [self invokeProcessing];
     } else {
-        __weak typeof(self)weakSelf;
+        __weak typeof(self)weakSelf = self;
 
         id notificationBlock = ^{
+            BITHockeyLogDebug(@"INFO: NSApplicationDidFinishLaunchingNotification observed - invokeProcessing");
             [weakSelf invokeProcessing];
         };
 
