@@ -582,6 +582,9 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
                 [self.delegate crashManagerWillCancelSendingCrashReport:self];
             }
 
+            if (userProvidedMetaData && self.persistUserInfo)
+                [self persistUserProvidedMetaData:userProvidedMetaData];
+
             if (self.lastCrashFilename)
                 [self cleanCrashReportWithFilename:[self.crashesDir stringByAppendingPathComponent: self.lastCrashFilename]];
 
