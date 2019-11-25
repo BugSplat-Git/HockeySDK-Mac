@@ -596,6 +596,9 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
             else if (userProvidedMetaData) {
                 self.userName = userProvidedMetaData.userName ?: self.userName;
                 self.userEmail = userProvidedMetaData.userEmail ?: self.userEmail;
+
+                //Needed here since description is read from file whne sending crash report.
+                [self persistDescription:userProvidedMetaData.userDescription];
             }
 
             [self approveLatestCrashReport];
