@@ -225,8 +225,8 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
   NSPropertyListFormat format;
   
   if (self.persistUserInfo) {
-    self.userName = bit_stringValueFromKeychainForKey([NSString stringWithFormat:@"default.%@", kBITCrashMetaUserName]);
-    self.userEmail = bit_stringValueFromKeychainForKey([NSString stringWithFormat:@"default.%@", kBITCrashMetaUserEmail]);
+    self.userName = bit_stringValueFromUserDefaultsForKey([NSString stringWithFormat:@"default.%@", kBITCrashMetaUserName]);
+    self.userEmail = bit_stringValueFromUserDefaultsForKey([NSString stringWithFormat:@"default.%@", kBITCrashMetaUserEmail]);
   }
 
   if (![self.fileManager fileExistsAtPath:self.settingsFile])
@@ -269,9 +269,9 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
   
   if (self.persistUserInfo) {
     NSString *cacheFilename = [filename lastPathComponent];
-    bit_removeKeyFromKeychain([NSString stringWithFormat:@"%@.%@", cacheFilename, kBITCrashMetaUserName]);
-    bit_removeKeyFromKeychain([NSString stringWithFormat:@"%@.%@", cacheFilename, kBITCrashMetaUserEmail]);
-    bit_removeKeyFromKeychain([NSString stringWithFormat:@"%@.%@", cacheFilename, kBITCrashMetaUserID]);
+    bit_removeKeyFromUserDefaults([NSString stringWithFormat:@"%@.%@", cacheFilename, kBITCrashMetaUserName]);
+    bit_removeKeyFromUserDefaults([NSString stringWithFormat:@"%@.%@", cacheFilename, kBITCrashMetaUserEmail]);
+    bit_removeKeyFromUserDefaults([NSString stringWithFormat:@"%@.%@", cacheFilename, kBITCrashMetaUserID]);
   }
 
   [self.crashFiles removeObject:filename];
@@ -281,7 +281,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
 }
 
 /**
- *	 Remove all crash reports and stored meta data for each from the file system and keychain
+ *	 Remove all crash reports and stored meta data for each from the file system and application UserDefaults
  *
  * This is currently only used as a helper method for tests
  */
@@ -317,11 +317,11 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
     NSString *crashFileUsernameKey = [NSString stringWithFormat:@"%@.%@", self.lastCrashFilename, kBITCrashMetaUserName];
 
     if (username && [username length] > 0 && self.persistUserInfo) {
-        bit_addStringValueToKeychain(username, usernameKey);
-        bit_addStringValueToKeychain(username, crashFileUsernameKey);
+        bit_addStringValueToUserDefaults(username, usernameKey);
+        bit_addStringValueToUserDefaults(username, crashFileUsernameKey);
     } else {
-        bit_removeKeyFromKeychain(usernameKey);
-        bit_removeKeyFromKeychain(crashFileUsernameKey);
+        bit_removeKeyFromUserDefaults(usernameKey);
+        bit_removeKeyFromUserDefaults(crashFileUsernameKey);
     }
 }
 
@@ -330,12 +330,12 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
     NSString *crashFileUserEmailKey = [NSString stringWithFormat:@"%@.%@", self.lastCrashFilename, kBITCrashMetaUserEmail];
 
     if (userEmail && [userEmail length] > 0 && self.persistUserInfo) {
-        bit_addStringValueToKeychain(userEmail, userEmailKey);
-        bit_addStringValueToKeychain(userEmail, crashFileUserEmailKey);
+        bit_addStringValueToUserDefaults(userEmail, userEmailKey);
+        bit_addStringValueToUserDefaults(userEmail, crashFileUserEmailKey);
     }
     else {
-        bit_removeKeyFromKeychain(userEmailKey);
-        bit_removeKeyFromKeychain(crashFileUserEmailKey);
+        bit_removeKeyFromUserDefaults(userEmailKey);
+        bit_removeKeyFromUserDefaults(crashFileUserEmailKey);
     }
 }
 
@@ -343,10 +343,10 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
     NSString *userIDKey = [NSString stringWithFormat:@"%@.%@", self.lastCrashFilename, kBITCrashMetaUserID];
 
     if (userID && [userID length] > 0 && self.persistUserInfo) {
-        bit_addStringValueToKeychain(userID, userIDKey);
+        bit_addStringValueToUserDefaults(userID, userIDKey);
     }
     else {
-        bit_removeKeyFromKeychain(userIDKey);
+        bit_removeKeyFromUserDefaults(userIDKey);
     }
 }
 
@@ -424,7 +424,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
     return self.userID;
   
     if (self.persistUserInfo) {
-  userID = bit_stringValueFromKeychainForKey(kBITDefaultUserID);
+  userID = bit_stringValueFromUserDefaultsForKey(kBITDefaultUserID);
     }
   
   id<BITHockeyManagerDelegate> delegate = [BITHockeyManager sharedHockeyManager].delegate;
@@ -443,7 +443,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
     return self.userName;
   
     if (self.persistUserInfo) {
-  userName = bit_stringValueFromKeychainForKey(kBITDefaultUserName);
+  userName = bit_stringValueFromUserDefaultsForKey(kBITDefaultUserName);
     }
   
   id<BITHockeyManagerDelegate> delegate = [BITHockeyManager sharedHockeyManager].delegate;
@@ -462,7 +462,7 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
     return self.userEmail;
   
     if (self.persistUserInfo) {
-  userEmail = bit_stringValueFromKeychainForKey(kBITDefaultUserEmail);
+  userEmail = bit_stringValueFromUserDefaultsForKey(kBITDefaultUserEmail);
     }
 
   
@@ -524,9 +524,9 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
   
     if (self.persistUserInfo)
     {
-  bit_addStringValueToKeychain([self userNameForCrashReport], [NSString stringWithFormat:@"%@.%@", filename, kBITCrashMetaUserName]);
-  bit_addStringValueToKeychain([self userEmailForCrashReport], [NSString stringWithFormat:@"%@.%@", filename, kBITCrashMetaUserEmail]);
-  bit_addStringValueToKeychain([self userIDForCrashReport], [NSString stringWithFormat:@"%@.%@", filename, kBITCrashMetaUserID]);
+  bit_addStringValueToUserDefaults([self userNameForCrashReport], [NSString stringWithFormat:@"%@.%@", filename, kBITCrashMetaUserName]);
+  bit_addStringValueToUserDefaults([self userEmailForCrashReport], [NSString stringWithFormat:@"%@.%@", filename, kBITCrashMetaUserEmail]);
+  bit_addStringValueToUserDefaults([self userIDForCrashReport], [NSString stringWithFormat:@"%@.%@", filename, kBITCrashMetaUserID]);
     }
   
   if (self.delegate != nil && [self.delegate respondsToSelector:@selector(applicationLogForCrashManager:)]) {
@@ -1061,9 +1061,9 @@ __attribute__((noreturn)) static void uncaught_cxx_exception_handler(const BITCr
                                                 errorDescription:&errorString];
       
             if (self.persistUserInfo) {
-      username = bit_stringValueFromKeychainForKey([NSString stringWithFormat:@"%@.%@", [filename lastPathComponent], kBITCrashMetaUserName]) ?: @"";
-      useremail = bit_stringValueFromKeychainForKey([NSString stringWithFormat:@"%@.%@", [filename lastPathComponent], kBITCrashMetaUserEmail]) ?: @"";
-      userid = bit_stringValueFromKeychainForKey([NSString stringWithFormat:@"%@.%@", [filename lastPathComponent], kBITCrashMetaUserID]) ?: @"";
+      username = bit_stringValueFromUserDefaultsForKey([NSString stringWithFormat:@"%@.%@", [filename lastPathComponent], kBITCrashMetaUserName]) ?: @"";
+      useremail = bit_stringValueFromUserDefaultsForKey([NSString stringWithFormat:@"%@.%@", [filename lastPathComponent], kBITCrashMetaUserEmail]) ?: @"";
+      userid = bit_stringValueFromUserDefaultsForKey([NSString stringWithFormat:@"%@.%@", [filename lastPathComponent], kBITCrashMetaUserID]) ?: @"";
             }
 
       applicationLog = [metaDict objectForKey:kBITCrashMetaApplicationLog] ?: @"";

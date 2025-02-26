@@ -76,8 +76,6 @@
 		1BFE83E71C45B21100DE0B39 /* BITMetricsManagerPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BFE83D61C45B21100DE0B39 /* BITMetricsManagerPrivate.h */; };
 		1E20566E15A5F61F008FC20A /* BITCrashManagerDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 1EE1DFFE1524B3D600C0DA76 /* BITCrashManagerDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1E260C9F17D414F200C7F9FE /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E260C9E17D414F200C7F9FE /* Security.framework */; };
-		1E260CA617D41E9100C7F9FE /* BITKeychainItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 1E260CA417D41E9000C7F9FE /* BITKeychainItem.h */; };
-		1E260CA717D41E9100C7F9FE /* BITKeychainItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E260CA517D41E9100C7F9FE /* BITKeychainItem.m */; };
 		1E260CAA17D42B1E00C7F9FE /* BITHockeyManagerDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 1E260CA917D42B1500C7F9FE /* BITHockeyManagerDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1E378AF419586A6900451E28 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E378AF319586A6900451E28 /* QuickLook.framework */; };
 		1E378AF9195899B400451E28 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E378AF8195899B400451E28 /* Quartz.framework */; };
@@ -147,7 +145,6 @@
 		69EAA67E1E4105DA00DB7393 /* BITHockeyHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E5515187F3EE700F0858E /* BITHockeyHelper.m */; };
 		69EAA67F1E4105DA00DB7393 /* BITHockeyLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 80EF93A11CD9334B006722E1 /* BITHockeyLogger.m */; };
 		69EAA6801E4105DA00DB7393 /* BITHockeyAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E5785DA19461DF60014D19A /* BITHockeyAttachment.m */; };
-		69EAA6821E4105DA00DB7393 /* BITKeychainItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E260CA517D41E9100C7F9FE /* BITKeychainItem.m */; };
 		69EAA6831E4105DA00DB7393 /* BITSDKColoredView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EBDC050195716F300B5C8A3 /* BITSDKColoredView.m */; };
 		69EAA6841E4105DA00DB7393 /* BITSDKTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EBDF2B01957878800C7F49A /* BITSDKTextFieldCell.m */; };
 		69EAA6851E4105DA00DB7393 /* BITSDKTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EC7152519573CB400F72C19 /* BITSDKTextView.m */; };
@@ -287,8 +284,6 @@
 		1BFE83D51C45B21100DE0B39 /* BITMetricsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.c.objc; path = BITMetricsManager.m; sourceTree = "<group>"; tabWidth = 2; };
 		1BFE83D61C45B21100DE0B39 /* BITMetricsManagerPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BITMetricsManagerPrivate.h; sourceTree = "<group>"; };
 		1E260C9E17D414F200C7F9FE /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
-		1E260CA417D41E9000C7F9FE /* BITKeychainItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BITKeychainItem.h; sourceTree = "<group>"; };
-		1E260CA517D41E9100C7F9FE /* BITKeychainItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BITKeychainItem.m; sourceTree = "<group>"; };
 		1E260CA917D42B1500C7F9FE /* BITHockeyManagerDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BITHockeyManagerDelegate.h; sourceTree = "<group>"; };
 		1E378AF11958498400451E28 /* BITSDKTextViewDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BITSDKTextViewDelegate.h; sourceTree = "<group>"; };
 		1E378AF319586A6900451E28 /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
@@ -472,8 +467,6 @@
 				1E5785D919461DF60014D19A /* BITHockeyAttachment.h */,
 				1E5785DA19461DF60014D19A /* BITHockeyAttachment.m */,
 				1EC2956B1B30572000CD53B2 /* HockeySDKNullability.h */,
-				1E260CA417D41E9000C7F9FE /* BITKeychainItem.h */,
-				1E260CA517D41E9100C7F9FE /* BITKeychainItem.m */,
 				1EBDC04F195716F300B5C8A3 /* BITSDKColoredView.h */,
 				1EBDC050195716F300B5C8A3 /* BITSDKColoredView.m */,
 				1EBDF2AF1957878800C7F49A /* BITSDKTextFieldCell.h */,
@@ -724,7 +717,6 @@
 				B270E4D91F3A51CF001C1C85 /* HockeySDKPrivate.h in Headers */,
 				1B078E371C98847100E2FD59 /* BITData.h in Headers */,
 				1E7E5509187F3ED800F0858E /* BITFeedbackManagerPrivate.h in Headers */,
-				1E260CA617D41E9100C7F9FE /* BITKeychainItem.h in Headers */,
 				1EBDC051195716F300B5C8A3 /* BITSDKColoredView.h in Headers */,
 				1B9D52781C8A773800D86C09 /* BITCrashReportTextFormatterPrivate.h in Headers */,
 				1E7E552A187F62B400F0858E /* BITSystemProfilePrivate.h in Headers */,
@@ -949,7 +941,6 @@
 				1E5785DC19461DF60014D19A /* BITHockeyAttachment.m in Sources */,
 				1BFE83E21C45B21100DE0B39 /* BITTelemetryContext.m in Sources */,
 				1EC715341957524B00F72C19 /* BITFeedbackMessageCellView.m in Sources */,
-				1E260CA717D41E9100C7F9FE /* BITKeychainItem.m in Sources */,
 				1E378B211959D33700451E28 /* BITActivityIndicatorButton.m in Sources */,
 				1B078E4B1C98847100E2FD59 /* BITUser.m in Sources */,
 			);
@@ -991,7 +982,6 @@
 				69EAA68C1E4105E200DB7393 /* BITCrashReportUI.m in Sources */,
 				69EAA6A31E4105F000DB7393 /* BITChannel.m in Sources */,
 				69EAA6831E4105DA00DB7393 /* BITSDKColoredView.m in Sources */,
-				69EAA6821E4105DA00DB7393 /* BITKeychainItem.m in Sources */,
 				69EAA6891E4105E200DB7393 /* BITCrashCXXExceptionHandler.mm in Sources */,
 				69EAA6841E4105DA00DB7393 /* BITSDKTextFieldCell.m in Sources */,
 				69EAA69D1E4105EB00DB7393 /* BITSession.m in Sources */,
@@ -1166,7 +1156,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = TN6R4Q475K;
+				DEVELOPMENT_TEAM = 7CFM4DQ87G;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -1205,7 +1195,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = TN6R4Q475K;
+				DEVELOPMENT_TEAM = 7CFM4DQ87G;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";

@@ -301,9 +301,9 @@ NSString *const kBITHockeySDKURL = @"https://sdk.hockeyapp.net/";
 - (void)setUserID:(NSString *)userID {
   if (self.crashManager.persistUserInfo) {
     if (!userID) {
-      bit_removeKeyFromKeychain(kBITDefaultUserID);
+      bit_removeKeyFromUserDefaults(kBITDefaultUserID);
     } else {
-      bit_addStringValueToKeychain(userID, kBITDefaultUserID);
+      bit_addStringValueToUserDefaults(userID, kBITDefaultUserID);
     }
   }
 }
@@ -311,9 +311,9 @@ NSString *const kBITHockeySDKURL = @"https://sdk.hockeyapp.net/";
 - (void)setUserName:(NSString *)userName {
   if (self.crashManager.persistUserInfo) {
     if (!userName) {
-      bit_removeKeyFromKeychain(kBITDefaultUserName);
+      bit_removeKeyFromUserDefaults(kBITDefaultUserName);
     } else {
-      bit_addStringValueToKeychain(userName, kBITDefaultUserName);
+      bit_addStringValueToUserDefaults(userName, kBITDefaultUserName);
     }
   }
 }
@@ -321,9 +321,9 @@ NSString *const kBITHockeySDKURL = @"https://sdk.hockeyapp.net/";
 - (void)setUserEmail:(NSString *)userEmail {
   if (self.crashManager.persistUserInfo) {
     if (!userEmail) {
-      bit_removeKeyFromKeychain(kBITDefaultUserEmail);
+      bit_removeKeyFromUserDefaults(kBITDefaultUserEmail);
     } else {
-      bit_addStringValueToKeychain(userEmail, kBITDefaultUserEmail);
+      bit_addStringValueToUserDefaults(userEmail, kBITDefaultUserEmail);
     }
   }
 }

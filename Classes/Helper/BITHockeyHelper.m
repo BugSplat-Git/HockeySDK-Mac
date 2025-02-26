@@ -1,7 +1,6 @@
 #import "BITHockeyHelper.h"
 #import "HockeySDK.h"
 #import "HockeySDKPrivate.h"
-#import "BITKeychainItem.h"
 #import <sys/sysctl.h>
 #import <AppKit/AppKit.h>
 
@@ -128,6 +127,7 @@ NSString *bit_appName(NSString *placeHolderString) {
   return appName;
 }
 
+// TODO: Candidate for removal
 NSString *bit_appAnonID(BOOL forceNewAnonID) {
   static NSString *appAnonID = nil;
   static dispatch_once_t predAppAnonID;
@@ -135,27 +135,27 @@ NSString *bit_appAnonID(BOOL forceNewAnonID) {
 
   if (forceNewAnonID) {
     appAnonID = bit_UUID();
-    // store this UUID in the keychain (on this device only) so we can be sure to always have the same ID upon app startups
+    // store this UUID in the application UserDefaults (on this device only) so we can be sure to always have the same ID upon app startups
     if (appAnonID) {
-      // add to keychain in a background thread, since we got reports that storing to the keychain may take several seconds sometimes and cause the app to be killed
+      // add to application UserDefaults in a background thread, since we got reports that storing to the application UserDefaults may take several seconds sometimes and cause the app to be killed
       // and we don't care about the result anyway
       dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
-        bit_addStringValueToKeychain(appAnonID, appAnonIDKey);
+        bit_addStringValueToUserDefaults(appAnonID, appAnonIDKey);
       });
     }
   } else {
     dispatch_once(&predAppAnonID, ^{
-      // first check if we already have an install string in the keychain
-      appAnonID = bit_stringValueFromKeychainForKey(appAnonIDKey);
+      // first check if we already have an install string in the application UserDefaults
+      appAnonID = bit_stringValueFromUserDefaultsForKey(appAnonIDKey);
       
       if (!appAnonID) {
         appAnonID = bit_UUID();
-        // store this UUID in the keychain (on this device only) so we can be sure to always have the same ID upon app startups
+        // store this UUID in the application UserDefaults (on this device only) so we can be sure to always have the same ID upon app startups
         if (appAnonID) {
-          // add to keychain in a background thread, since we got reports that storing to the keychain may take several seconds sometimes and cause the app to be killed
+          // add to application UserDefaults in a background thread, since we got reports that storing to the application UserDefaults may take several seconds sometimes and cause the app to be killed
           // and we don't care about the result anyway
           dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
-            bit_addStringValueToKeychain(appAnonID, appAnonIDKey);
+            bit_addStringValueToUserDefaults(appAnonID, appAnonIDKey);
           });
         }
       }
@@ -165,6 +165,7 @@ NSString *bit_appAnonID(BOOL forceNewAnonID) {
   return appAnonID;
 }
 
+// TODO: Candidate for removal
 NSString *bit_UUID(void) {
   CFUUIDRef theToken = CFUUIDCreate(NULL);
   CFStringRef uuidStringRef = CFUUIDCreateString(NULL, theToken);
@@ -199,53 +200,81 @@ NSString *bit_settingsDir(void) {
   return settingsDir;
 }
 
-#pragma mark - Keychain
+#pragma mark - UserDefaults
 
-BOOL bit_addStringValueToKeychain(NSString *stringValue, NSString *key) {
-  if (!key || !stringValue)
-    return NO;
-  
-  NSString *serviceName = [NSString stringWithFormat:@"%@.BugsplatMac", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIdentifier"]];
-  
-  BITGenericKeychainItem *item = [BITGenericKeychainItem genericKeychainItemForService:serviceName withUsername:key];
-  
-  if (item) {
-    // update
-    [item setPassword:stringValue];
-    return YES;
-  } else {
-    if ([BITGenericKeychainItem addGenericKeychainItemForService:serviceName withUsername:key password:stringValue])
-      return YES;
-  }
-  
-  return NO;
+NSString *getUserDefaultsKey(NSString* key)
+{
+    if (!key) {
+        return nil;
+    }
+    
+    return [NSString stringWithFormat:@"__BugSplatMac.%@", key];
 }
 
-NSString *bit_stringValueFromKeychainForKey(NSString *key) {
-  if (!key)
-    return nil;
-  
-  NSString *serviceName = [NSString stringWithFormat:@"%@.BugsplatMac", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIdentifier"]];
-  
-  BITGenericKeychainItem *item = [BITGenericKeychainItem genericKeychainItemForService:serviceName withUsername:key];
-  if (item) {
-    NSString *pwd = [item password];
-    return pwd;
-  }
-  
-  return nil;
+BOOL bit_addStringValueToUserDefaults(NSString *stringValue, NSString *key) {
+    if (!key || !stringValue) {
+        return NO;
+    }
+    
+    // Application domain:
+    // https://developer.apple.com/library/archive/documentation/LegacyTechnologies/WebObjects/WebObjects_3.5/Reference/Frameworks/ObjC/Foundation/Classes/NSUserDefaults/Description.html#//apple_ref/occ/cl/NSUserDefaults
+    NSString *applicationName = [[NSProcessInfo processInfo] processName];
+    NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:applicationName];
+
+    NSString *actualKey = getUserDefaultsKey(key);
+
+    [userDefaults setObject:stringValue forKey:actualKey];
+    
+    // Save changes
+    [userDefaults synchronize];
+    
+    NSString *savedValue = [userDefaults stringForKey:actualKey];
+    
+    return savedValue == stringValue;
 }
 
-BOOL bit_removeKeyFromKeychain(NSString *key) {
-  NSString *serviceName = [NSString stringWithFormat:@"%@.BugsplatMac", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIdentifier"]];
+NSString *bit_stringValueFromUserDefaultsForKey(NSString *key) {
+    if (!key) {
+        return nil;
+    }
   
-  BITGenericKeychainItem *item = [BITGenericKeychainItem genericKeychainItemForService:serviceName withUsername:key];
-  if (item) {
-    [item removeFromKeychain];
-    return YES;
-  }
-  
-  return NO;
+    // Application domain:
+    // https://developer.apple.com/library/archive/documentation/LegacyTechnologies/WebObjects/WebObjects_3.5/Reference/Frameworks/ObjC/Foundation/Classes/NSUserDefaults/Description.html#//apple_ref/occ/cl/NSUserDefaults
+    NSString *applicationName = [[NSProcessInfo processInfo] processName];
+    NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:applicationName];
+
+    NSString *actualKey = getUserDefaultsKey(key);
+
+    NSString *result = [userDefaults stringForKey:actualKey];
+
+    if (!result) {
+        // Default empty string so we don't break callers
+        result = [[NSString alloc] init];
+    }
+    
+    return result;
+}
+
+BOOL bit_removeKeyFromUserDefaults(NSString *key) {
+    if (!key) {
+        return NO;
+    }
+    
+    // Application domain:
+    // https://developer.apple.com/library/archive/documentation/LegacyTechnologies/WebObjects/WebObjects_3.5/Reference/Frameworks/ObjC/Foundation/Classes/NSUserDefaults/Description.html#//apple_ref/occ/cl/NSUserDefaults
+    NSString *applicationName = [[NSProcessInfo processInfo] processName];
+    NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:applicationName];
+
+    NSString *actualKey = getUserDefaultsKey(key);
+
+    BOOL result = [userDefaults objectForKey:actualKey] != nil;
+    
+    [userDefaults removeObjectForKey:actualKey];
+    
+    // Save changes
+    [userDefaults synchronize];
+    
+    return result;
 }
 
 BOOL bit_isDebuggerAttached(void) {

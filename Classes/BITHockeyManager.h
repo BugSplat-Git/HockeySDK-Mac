@@ -217,8 +217,8 @@
  Right now this is used by the `BITCrashManager` to attach to a crash report.
  `BITFeedbackManager` uses it too for assigning the user to a discussion thread.
  
- The value can be set at any time and will be stored in the keychain on the current
- device only! To delete the value from the keychain set the value to `nil`.
+ The value can be set at any time and will be stored in the application UserDefaults on the current
+ device only! To delete the value from the application UserDefaults set the value to `nil`.
  
  This property is optional and can be used as an alternative to the delegate. If you
  want to define specific data for each component, use the delegate instead which does
@@ -244,8 +244,8 @@
  Right now this is used by the `BITCrashManager` to attach to a crash report.
  `BITFeedbackManager` uses it too for assigning the user to a discussion thread.
  
- The value can be set at any time and will be stored in the keychain on the current
- device only! To delete the value from the keychain set the value to `nil`.
+ The value can be set at any time and will be stored in the application UserDefaults on the current
+ device only! To delete the value from the application UserDefaults set the value to `nil`.
  
  This property is optional and can be used as an alternative to the delegate. If you
  want to define specific data for each component, use the delegate instead which does
@@ -271,8 +271,8 @@
  Right now this is used by the `BITCrashManager` to attach to a crash report.
  `BITFeedbackManager` uses it too for assigning the user to a discussion thread.
  
- The value can be set at any time and will be stored in the keychain on the current
- device only! To delete the value from the keychain set the value to `nil`.
+ The value can be set at any time and will be stored in the application UserDefaults on the current
+ device only! To delete the value from the application UserDefaults set the value to `nil`.
  
  This property is optional and can be used as an alternative to the delegate. If you
  want to define specific data for each component, use the delegate instead which does

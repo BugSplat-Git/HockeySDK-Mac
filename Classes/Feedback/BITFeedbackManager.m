@@ -164,7 +164,7 @@
 - (BOOL)updateUserIDUsingDelegate {
   BOOL availableViaDelegate = NO;
   
-  NSString *userID = bit_stringValueFromKeychainForKey(kBITDefaultUserID);
+  NSString *userID = bit_stringValueFromUserDefaultsForKey(kBITDefaultUserID);
   
   id<BITHockeyManagerDelegate> delegate = [BITHockeyManager sharedHockeyManager].delegate;
   if (delegate && [delegate respondsToSelector:@selector(userIDForHockeyManager:componentManager:)]) {
@@ -183,7 +183,7 @@
 - (BOOL)updateUserNameUsingDelegate {
   BOOL availableViaDelegate = NO;
   
-  NSString *userName = bit_stringValueFromKeychainForKey(kBITDefaultUserName);
+  NSString *userName = bit_stringValueFromUserDefaultsForKey(kBITDefaultUserName);
   
   id<BITHockeyManagerDelegate> delegate = [BITHockeyManager sharedHockeyManager].delegate;
   if (delegate && [delegate respondsToSelector:@selector(userNameForHockeyManager:componentManager:)]) {
@@ -203,7 +203,7 @@
 - (BOOL)updateUserEmailUsingDelegate {
   BOOL availableViaDelegate = NO;
   
-  NSString *userEmail = bit_stringValueFromKeychainForKey(kBITDefaultUserEmail);
+  NSString *userEmail = bit_stringValueFromUserDefaultsForKey(kBITDefaultUserEmail);
   
   id<BITHockeyManagerDelegate> delegate = [BITHockeyManager sharedHockeyManager].delegate;
   if (delegate && [delegate respondsToSelector:@selector(userEmailForHockeyManager:componentManager:)]) {

@@ -10,14 +10,14 @@ NSString *bit_mainBundleIdentifier(void);
 NSString *bit_appIdentifierToGuid(NSString *appIdentifier);
 NSString *bit_appName(NSString *placeHolderString);
 
-NSString *bit_appAnonID(BOOL forceNewAnonID);
-NSString *bit_UUID(void);
+NSString *bit_appAnonID(BOOL forceNewAnonID); // TODO: Candidate for removal
+NSString *bit_UUID(void); // TODO: Candidate for removal
 
 NSString *bit_settingsDir(void);
 
-BOOL bit_addStringValueToKeychain(NSString *stringValue, NSString *key);
-NSString *bit_stringValueFromKeychainForKey(NSString *key);
-BOOL bit_removeKeyFromKeychain(NSString *key);
+BOOL bit_addStringValueToUserDefaults(NSString *stringValue, NSString *key);
+NSString *bit_stringValueFromUserDefaultsForKey(NSString *key);
+BOOL bit_removeKeyFromUserDefaults(NSString *key);
 BOOL bit_isDebuggerAttached(void);
 
 /* Context helpers */
