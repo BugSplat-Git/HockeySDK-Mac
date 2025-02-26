@@ -202,7 +202,7 @@ NSString *bit_settingsDir(void) {
 
 #pragma mark - UserDefaults
 
-NSString *getUserDefaultsKey(NSString* key)
+NSString *bit_getUserDefaultsKey(NSString* key)
 {
     if (!key) {
         return nil;
@@ -221,7 +221,7 @@ BOOL bit_addStringValueToUserDefaults(NSString *stringValue, NSString *key) {
     NSString *applicationName = [[NSProcessInfo processInfo] processName];
     NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:applicationName];
 
-    NSString *actualKey = getUserDefaultsKey(key);
+    NSString *actualKey = bit_getUserDefaultsKey(key);
 
     [userDefaults setObject:stringValue forKey:actualKey];
     
@@ -229,6 +229,8 @@ BOOL bit_addStringValueToUserDefaults(NSString *stringValue, NSString *key) {
     [userDefaults synchronize];
     
     NSString *savedValue = [userDefaults stringForKey:actualKey];
+    
+    NSLog(@"bit_addStringValueToUserDefaults: set key '%@' ('%@') to value '%@' results in value '%@'", key, actualKey, stringValue, savedValue);
     
     return savedValue == stringValue;
 }
@@ -243,7 +245,7 @@ NSString *bit_stringValueFromUserDefaultsForKey(NSString *key) {
     NSString *applicationName = [[NSProcessInfo processInfo] processName];
     NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:applicationName];
 
-    NSString *actualKey = getUserDefaultsKey(key);
+    NSString *actualKey = bit_getUserDefaultsKey(key);
 
     NSString *result = [userDefaults stringForKey:actualKey];
 
@@ -251,7 +253,9 @@ NSString *bit_stringValueFromUserDefaultsForKey(NSString *key) {
         // Default empty string so we don't break callers
         result = [[NSString alloc] init];
     }
-    
+
+    NSLog(@"bit_stringValueFromUserDefaultsForKey: get key '%@' ('%@') results in value '%@'", key, actualKey, result);
+
     return result;
 }
 
@@ -265,15 +269,17 @@ BOOL bit_removeKeyFromUserDefaults(NSString *key) {
     NSString *applicationName = [[NSProcessInfo processInfo] processName];
     NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:applicationName];
 
-    NSString *actualKey = getUserDefaultsKey(key);
+    NSString *actualKey = bit_getUserDefaultsKey(key);
 
     BOOL result = [userDefaults objectForKey:actualKey] != nil;
-    
+
     [userDefaults removeObjectForKey:actualKey];
     
     // Save changes
     [userDefaults synchronize];
     
+    NSLog(@"bit_removeKeyFromUserDefaults: remove key '%@' ('%@') results in value %@", key, actualKey, result ? @"YES" : @"NO");
+
     return result;
 }
 
